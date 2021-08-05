@@ -1,10 +1,26 @@
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel, QGridLayout, QTextEdit, QComboBox
 from PyQt5.QtWidgets import QLineEdit, QPushButton, QHBoxLayout, QPlainTextEdit
 import sys
 import ComputingSoftware
 import SQLHandler
+
+
+class SkewDiagramField(QLabel):
+    def __init__(self):
+        super().__init__()
+        self.setAlignment(Qt.AlignCenter)
+        self.setStyleSheet('''
+            QLabel{
+                border: 4px dashed #aaa
+            }
+        ''')
+
+    def setPixmap(self, image):
+        super().setPixmap(image)
+
 class BioinformaticTool(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -13,7 +29,8 @@ class BioinformaticTool(QWidget):
 
     def interfejs(self):
 
-        opis = QLabel("Placeholder opisu", self)
+        opis = QLabel('''This is a DNA analyzing bioinformatic tool made based on Finding Hidden Messages in DNA (Bioinformatics I) course on Coursera provided
+by University of California San Diego, and my own effort. Current features include transcription, translation, enzymatic retriction and finding origin of replication.''', self)
         oriButton = QPushButton("Ori", self)
         transcriptionButton = QPushButton("Transcription", self)
         translationButton = QPushButton("Translation", self)
@@ -30,7 +47,7 @@ class BioinformaticTool(QWidget):
 
         self.setGeometry(20, 20, 1000, 300)
         self.setWindowIcon(QIcon('icon.png'))
-        self.setWindowTitle("Bioinformatic tool placeholder")
+        self.setWindowTitle("DNAnalyzer")
         self.show()
 
         oriButton.clicked.connect(self.software)
@@ -68,28 +85,33 @@ class RestrictionWindow(QWidget):
         self.inputWindow = QTextEdit("", self)
         self.outputWindow = QTextEdit("", self)
         self.enzymesList = QComboBox(self)
-        restricsButton = QPushButton("Restrict", self)
-        self.secOutputWidnow = QTextEdit("", self)
+        self.restricsButton = QPushButton("Restrict", self)
+        self.secOutputWidnow = QLineEdit("", self)
         self.placeLabel = QLabel("Restriction location:", self)
 
         self.enzymesList.addItems(SQLHandler.ListPopulation())
 
         ukladT = QGridLayout()
+        self.setLayout(ukladT)
+        ukladT.setColumnStretch(0, 1)
+        ukladT.setColumnStretch(1, 1)
+        ukladT.setColumnStretch(2, 1)
+        ukladT.setColumnStretch(3, 1)
         ukladT.addWidget(opis, 0, 0, 1, 4)
         ukladT.addWidget(self.inputWindow, 1, 0, 4, 2)
         ukladT.addWidget(self.outputWindow, 1, 2, 5, 2)
         ukladT.addWidget(self.enzymesList, 5, 0, 1, 2)
-        ukladT.addWidget(restricsButton, 6, 0, 2, 2)
-        ukladT.addWidget(self.secOutputWidnow, 6, 3, 2, 1)
-        ukladT.addWidget(self.placeLabel, 6, 2, 2, 1)
+        ukladT.addWidget(self.restricsButton, 6, 0, 1, 2)
+        ukladT.addWidget(self.secOutputWidnow, 6, 3, 1, 1)
+        ukladT.addWidget(self.placeLabel, 6, 2, 1, 1)
 
         self.setLayout(ukladT)
 
-        self.setGeometry(20, 20, 1000, 300)
+        self.setGeometry(100, 60, 1000, 800)
         self.setWindowIcon(QIcon('icon.png'))
-        self.setWindowTitle("Bioinformatic tool placeholder")
+        self.setWindowTitle("DNAnalyzer")
 
-        restricsButton.clicked.connect(self.RetrictionButtonSoftware)
+        self.restricsButton.clicked.connect(self.RetrictionButtonSoftware)
 
     def RetrictionButtonSoftware(self):
         singleCharCode = ["A","G","C","T","D","B","H","K","M","N","R","S","V","W","Y"]
@@ -101,10 +123,6 @@ class RestrictionWindow(QWidget):
                 if letter not in singleCharCode:
                     seq = seq.replace(letter, '')
             self.outputWindow.setPlainText(seq)
-
-
-
-
 
 class TranscriptionWindow(QWidget):
     def __init__(self, parent=None):
@@ -125,6 +143,14 @@ class TranscriptionWindow(QWidget):
         self.NctNumwindow = QLineEdit("", self)
 
         ukladT = QGridLayout()
+        ukladT.setColumnStretch(0, 1)
+        ukladT.setColumnStretch(1, 1)
+        ukladT.setColumnStretch(2, 1)
+        ukladT.setColumnStretch(3, 1)
+        ukladT.setColumnStretch(4, 1)
+        ukladT.setColumnStretch(5, 1)
+        ukladT.setColumnStretch(6, 1)
+        #ukladT.setColumnStretch(7, 1)
         ukladT.addWidget(opis, 0, 0, 1, 8)
         ukladT.addWidget(self.inputWindow, 1, 0, 6, 4)
         ukladT.addWidget(self.outputWindow, 1, 4, 3, 4)
@@ -141,7 +167,7 @@ class TranscriptionWindow(QWidget):
 
         self.setGeometry(20, 20, 1000, 300)
         self.setWindowIcon(QIcon('icon.png'))
-        self.setWindowTitle("Bioinformatic tool placeholder")
+        self.setWindowTitle("DNAnalyzer")
 
         transcribeButton.clicked.connect(self.software2)
 
@@ -187,7 +213,7 @@ class TranslationWindow(QWidget):
 
         self.setGeometry(20, 20, 1000, 300)
         self.setWindowIcon(QIcon('icon.png'))
-        self.setWindowTitle("Bioinformatic tool placeholder")
+        self.setWindowTitle("DNAnalyzer")
 
         translateButton.clicked.connect(self.software3)
 
@@ -211,20 +237,37 @@ class OriWindow(QWidget):
 
         opis = QLabel("Placeholder opisu", self)
         self.inputWindow = QTextEdit("", self)
+        self.diagram = SkewDiagramField()
+        self.oriButton = QPushButton("Find Ori", self)
 
         ukladT = QGridLayout()
         ukladT.addWidget(opis, 0, 0, 1, 2)
-        ukladT.addWidget(self.inputWindow, 1, 0, 4, 1)
+        ukladT.addWidget(self.inputWindow, 1, 0, 4, 2)
+        ukladT.addWidget(self.diagram, 1, 2, 4, 2)
+        ukladT.addWidget(self.oriButton, 5, 0, 1, 4)
 
         self.setLayout(ukladT)
 
         self.setGeometry(20, 20, 1000, 300)
         self.setWindowIcon(QIcon('icon.png'))
-        self.setWindowTitle("Bioinformatic tool placeholder")
+        self.setWindowTitle("DNAnalyzer")
 
+        self.oriButton.clicked.connect(self.software4)
+
+    def set_image(self, diagram):
+        self.diagram.setPixmap(QPixmap(diagram))
+
+    def software4(self):
+
+        nadawca4 = self.sender()
+        sequence = self.inputWindow.toPlainText()
+        if nadawca4.text() == "Find Ori":
+            diag = ComputingSoftware.SkewDiagram(sequence)[1]
+            print(ComputingSoftware.SkewDiagram(sequence)[1])
+            self.set_image(diag)
 
 if __name__ == '__main__':
-
     app = QApplication(sys.argv)
     okno = BioinformaticTool()
     sys.exit(app.exec_())
+

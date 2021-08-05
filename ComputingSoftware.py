@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+
+
 def Transcription(sequence):
 
     Seq = sequence.upper()
@@ -299,7 +302,9 @@ def SkewDiagram(genome):
             skew.append(x)
     mini = min(skew)
     indices = [i for i, x in enumerate(skew) if x == mini]
-    return indices
+    plt.plot(skew)
+    diag = plt.savefig('testplot.png')
+    return indices, diag
 
 def MolecularWeight(protSequence):
 
@@ -348,3 +353,4 @@ def MolecularWeight(protSequence):
             molecularWeight += 117.1
 
     return molecularWeight
+
