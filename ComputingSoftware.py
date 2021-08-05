@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
+from PyQt5.QtWidgets import QFileDialog
+import os
 
-
-def Transcription(sequence):
-
-    Seq = sequence.upper()
+def Purifier(genome):
+    Seq = genome.upper()
 
     Seq = Seq.replace(" ", "")
     Seq = Seq.replace("0", "")
@@ -18,6 +18,12 @@ def Transcription(sequence):
     Seq = Seq.replace("9", "")
     Seq = Seq.replace("\n", "")
     Seq = Seq.strip()
+
+    return Seq
+
+def Transcription(sequence):
+
+    Seq = Purifier(sequence)
 
     Length = len(Seq)
     if Length < 2:
@@ -125,9 +131,9 @@ def Translation(sequence):
     t = t.replace('cac', 'H')
     t = t.replace('caa', 'Q')
     t = t.replace('cag', 'Q')
-    t = t.replace('uag', 'STOP')
-    t = t.replace('uaa', 'STOP')
-    t = t.replace('uga', 'STOP')
+    t = t.replace('uag', '|')
+    t = t.replace('uaa', '|')
+    t = t.replace('uga', '|')
 #deletes additional nucleotides
     t = t.replace("t", "")
     t = t.replace('u', "")
@@ -243,10 +249,7 @@ def ApproximatePatternCount(genome, pattern, d):
     index = -1
     for i in range(len(genome) - len(pattern)+1):
         pattern2 = genome[i: i + len(pattern)]
-        #print(pattern)
-        #print(pattern2)
         x = HammingDistance(pattern, pattern2)
-        #print(x)
         index += 1
         if x <= d:
             appCount += 1
@@ -288,23 +291,33 @@ def MostFrequentPattern(genome, d, patternLenght):
     return output
 
 def SkewDiagram(genome):
+    os.remove("SkewDiagram.png")
+    genome = Purifier(genome)
     skew = []
     x = 0
-    skew.append(x)
+    xAxisList = []
+    xAxisIndex = 1
     for i in genome:
         if i == "C":
             x -= 1
             skew.append(x)
+            xAxisIndex += 1
+            xAxisList.append(xAxisIndex)
         elif i == "G":
             x += 1
             skew.append(x)
+            xAxisIndex += 1
+            xAxisList.append(xAxisIndex)
         else:
             skew.append(x)
+            xAxisIndex += 1
+            xAxisList.append(xAxisIndex)
     mini = min(skew)
     indices = [i for i, x in enumerate(skew) if x == mini]
     plt.plot(skew)
-    diag = plt.savefig('testplot.png')
-    return indices, diag
+    plt.xlim(xmin=0)
+    plt.savefig("SkewDiagram.png")
+    return indices
 
 def MolecularWeight(protSequence):
 
@@ -354,3 +367,22 @@ def MolecularWeight(protSequence):
 
     return molecularWeight
 
+def SaveDiagram(file_name, genome):
+    genome = Purifier(genome)
+    folderName = QFileDialog.getExistingDirectory(None)
+    os.chdir(folderName)
+    skew = [0]
+    x = 0
+    skew.append(x)
+    for i in genome:
+        if i == "C":
+            x -= 1
+            skew.append(x)
+        elif i == "G":
+            x += 1
+            skew.append(x)
+        else:
+            skew.append(x)
+    plt.plot(skew)
+    plt.xlim(xmin=0)
+    plt.savefig(file_name)
