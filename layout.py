@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel, QGridLayout, QTextEdit, QComboBox
@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QLineEdit, QPushButton, QHBoxLayout, QPlainTextEdit
 import sys
 import ComputingSoftware
 import SQLHandler
+
 
 
 class SkewDiagramField(QLabel):
@@ -122,7 +123,7 @@ class RestrictionWindow(QWidget):
             for letter in seq:
                 if letter not in singleCharCode:
                     seq = seq.replace(letter, '')
-            self.outputWindow.setPlainText(seq)
+            self.outputWindow.setPlainText()
 
 class TranscriptionWindow(QWidget):
     def __init__(self, parent=None):
@@ -235,39 +236,55 @@ class OriWindow(QWidget):
 
     def interfejs(self):
 
+
+
         opis = QLabel("Placeholder opisu", self)
         self.inputWindow = QTextEdit("", self)
         self.diagram = SkewDiagramField()
         self.oriButton = QPushButton("Find Ori", self)
+        self.saveButton = QPushButton("Save diagram", self)
+        self.diagNameWidnow = QLineEdit("", self)
+        self.minSkewLabel = QLabel("Approximate Ori:", self)
+        self.minSkewWindow = QLineEdit("", self)
 
         ukladT = QGridLayout()
         ukladT.addWidget(opis, 0, 0, 1, 2)
         ukladT.addWidget(self.inputWindow, 1, 0, 4, 2)
         ukladT.addWidget(self.diagram, 1, 2, 4, 2)
-        ukladT.addWidget(self.oriButton, 5, 0, 1, 4)
+        ukladT.addWidget(self.oriButton, 7, 0, 1, 4)
+        ukladT.addWidget(self.saveButton, 6, 3, 1, 1)
+        ukladT.addWidget(self.diagNameWidnow, 6, 2, 1, 1)
+        ukladT.addWidget(self.minSkewLabel, 5, 2, 1, 1, alignment=Qt.AlignRight)
+        ukladT.addWidget(self.minSkewWindow, 5, 3, 1, 1)
+        ukladT.setColumnStretch(0, 1)
+        ukladT.setColumnStretch(1, 1)
+        ukladT.setColumnStretch(2, 1)
+        ukladT.setColumnStretch(3, 1)
 
         self.setLayout(ukladT)
 
-        self.setGeometry(20, 20, 1000, 300)
+        self.resize(1600, 800)
         self.setWindowIcon(QIcon('icon.png'))
         self.setWindowTitle("DNAnalyzer")
 
         self.oriButton.clicked.connect(self.software4)
+        self.saveButton.clicked.connect(self.software4)
 
     def set_image(self, diagram):
         self.diagram.setPixmap(QPixmap(diagram))
 
     def software4(self):
-
         nadawca4 = self.sender()
         sequence = self.inputWindow.toPlainText()
+        diagName = self.diagNameWidnow.text()
         if nadawca4.text() == "Find Ori":
-            diag = ComputingSoftware.SkewDiagram(sequence)[1]
-            print(ComputingSoftware.SkewDiagram(sequence)[1])
-            self.set_image(diag)
+            self.minSkewWindow.setText(str(ComputingSoftware.SkewDiagram(sequence)))
+            self.set_image("SkewDiagram.png")
+        elif nadawca4.text() == "Save diagram":
+            ComputingSoftware.SaveDiagram(diagName, sequence)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     okno = BioinformaticTool()
     sys.exit(app.exec_())
-
