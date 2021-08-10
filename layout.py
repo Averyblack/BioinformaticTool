@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QGridLayout, QTextEdit, QComboBox
+from PyQt5.QtWidgets import QLabel, QGridLayout, QTextEdit, QComboBox, QCheckBox
 from PyQt5.QtWidgets import QLineEdit, QPushButton, QHBoxLayout, QPlainTextEdit
 import sys
 import ComputingSoftware
@@ -10,18 +10,22 @@ import SQLHandler
 
 
 class SkewDiagramField(QLabel):
+    #Constructor of the object
     def __init__(self):
         super().__init__()
+
+        #Prepares field where diagram will be shown
         self.setAlignment(Qt.AlignCenter)
         self.setStyleSheet('''
             QLabel{
                 border: 4px dashed #aaa
             }
         ''')
-
+    # Outputs diagram on a UI
     def setPixmap(self, image):
         super().setPixmap(image)
 
+# Main program window
 class BioinformaticTool(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -197,36 +201,51 @@ class TranslationWindow(QWidget):
                 # etykiety
         opis = QLabel("Placeholder opisu", self)
         self.inputWindow = QTextEdit("", self)
-        translateButton = QPushButton("Translate", self)
+        self.translateButton = QPushButton("Translate", self)
         self.outputWindow = QTextEdit("", self)
         masLabel = QLabel("Mol. mass: ", self)
         self.mas = QLineEdit("", self)
+        self.NcbiCheck = QCheckBox("NCBI sequence")
 
         ukladT = QGridLayout()
         ukladT.addWidget(opis, 0, 0, 1, 4)
-        ukladT.addWidget(self.inputWindow, 1, 0, 3, 3)
-        ukladT.addWidget(translateButton, 4, 0, 1, 6)
+        ukladT.addWidget(self.inputWindow, 1, 0, 2, 3)
+        ukladT.addWidget(self.translateButton, 4, 0, 1, 6)
         ukladT.addWidget(self.outputWindow, 1, 3, 2, 3)
         ukladT.addWidget(masLabel, 3, 3, 1, 1)
         ukladT.addWidget(self.mas, 3, 4, 1, 2)
-
+        ukladT.addWidget(self.NcbiCheck, 3, 0, 1, 1)
         self.setLayout(ukladT)
-
         self.setGeometry(20, 20, 1000, 300)
         self.setWindowIcon(QIcon('icon.png'))
         self.setWindowTitle("DNAnalyzer")
 
-        translateButton.clicked.connect(self.software3)
+        #Binds NCBI checkbox to the software3 method
+        self.NcbiCheck.toggled.connect(lambda: self.software3(self.NcbiCheck))
 
-    def software3(self):
+    def software3(self, state):
+        state = self.sender()
 
-        nadawca3 = self.sender()
-        sequence = self.inputWindow.toPlainText()
-        if nadawca3.text() == "Translate":
-            output = ComputingSoftware.Translation(sequence)
-            molecularWeight = ComputingSoftware.MolecularWeight(output)
-            self.outputWindow.setPlainText(output)
-            self.mas.setText(str(molecularWeight))
+        #nested function for translate button so it's functionality can be changed by NCBI box
+        def buttonClick(click):
+            click = self.sender()
+            if click.text() == "Translate":
+                output = ComputingSoftware.Translation(sequence)
+                molecularWeight = ComputingSoftware.MolecularWeight(output)
+                self.outputWindow.setPlainText(output)
+                self.mas.setText(str(molecularWeight))
+
+        #Checks if the NCBI checkbox is checked, and alters sequence if so
+        if state.isChecked() == False:
+            sequence = self.inputWindow.toPlainText()
+            self.translateButton.clicked.connect(buttonClick)
+            buttonClick(self.translateButton)
+        elif state.isChecked() == True:
+            sequence = ComputingSoftware.NcbiTtoU(self.inputWindow.toPlainText())
+            self.translateButton.clicked.connect(buttonClick)
+            buttonClick(self.translateButton)
+
+
 
 class OriWindow(QWidget):
     def __init__(self, parent=None):
@@ -278,10 +297,11 @@ class OriWindow(QWidget):
         sequence = self.inputWindow.toPlainText()
         diagName = self.diagNameWidnow.text()
         if nadawca4.text() == "Find Ori":
-            self.minSkewWindow.setText(str(ComputingSoftware.SkewDiagram(sequence)))
-            self.set_image("SkewDiagram.png")
-        elif nadawca4.text() == "Save diagram":
-            ComputingSoftware.SaveDiagram(diagName, sequence)
+            result = ComputingSoftware.SkewDiagram(sequence)
+            self.minSkewWindow.setText(str(result[0]))
+            self.set_image('SkewDiagram.png')
+        if nadawca4.text() == "Save diagram":
+            ComputingSoftware.SaveDiagram(diagName, ComputingSoftware.SkewDiagram(sequence)[1])
 
 
 if __name__ == '__main__':
