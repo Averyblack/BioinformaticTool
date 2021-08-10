@@ -1,25 +1,19 @@
 import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import QFileDialog
 import os
+import re
 
+#Removes evry signa other than nucleotide ACTG
 def Purifier(genome):
     Seq = genome.upper()
-
-    Seq = Seq.replace(" ", "")
-    Seq = Seq.replace("0", "")
-    Seq = Seq.replace("1", "")
-    Seq = Seq.replace("2", "")
-    Seq = Seq.replace("3", "")
-    Seq = Seq.replace("4", "")
-    Seq = Seq.replace("5", "")
-    Seq = Seq.replace("6", "")
-    Seq = Seq.replace("7", "")
-    Seq = Seq.replace("8", "")
-    Seq = Seq.replace("9", "")
-    Seq = Seq.replace("\n", "")
-    Seq = Seq.strip()
-
+    Seq = re.sub("[^ACTG]", "", Seq)
     return Seq
+
+#Changes T to U if sequence origins from NCBI cuz they succ
+def NcbiTtoU(genome):
+    genome = Purifier(genome).upper()
+    seq = re.sub("T", 'U', genome)
+    return seq
 
 def Transcription(sequence):
 
@@ -62,6 +56,7 @@ def ATPercentageCount(GC):
     return AT
 
 def Translation(sequence):
+    Seq = Purifier(sequence)
     Seq = sequence.lower()
     if "t" in Seq:
         Seq = str(Transcription(Seq)).lower()
@@ -291,12 +286,11 @@ def MostFrequentPattern(genome, d, patternLenght):
     return output
 
 def SkewDiagram(genome):
-    os.remove("SkewDiagram.png")
     genome = Purifier(genome)
     skew = []
     x = 0
     xAxisList = []
-    xAxisIndex = 1
+    xAxisIndex = -1
     for i in genome:
         if i == "C":
             x -= 1
@@ -314,10 +308,11 @@ def SkewDiagram(genome):
             xAxisList.append(xAxisIndex)
     mini = min(skew)
     indices = [i for i, x in enumerate(skew) if x == mini]
-    plt.plot(skew)
+    diag = plt.figure()
+    plt.plot(xAxisList, skew, figure = diag)
     plt.xlim(xmin=0)
-    plt.savefig("SkewDiagram.png")
-    return indices
+    diag.savefig('SkewDiagram.png')
+    return indices, diag
 
 def MolecularWeight(protSequence):
 
@@ -367,22 +362,7 @@ def MolecularWeight(protSequence):
 
     return molecularWeight
 
-def SaveDiagram(file_name, genome):
-    genome = Purifier(genome)
+def SaveDiagram(file_name, figure):
     folderName = QFileDialog.getExistingDirectory(None)
     os.chdir(folderName)
-    skew = [0]
-    x = 0
-    skew.append(x)
-    for i in genome:
-        if i == "C":
-            x -= 1
-            skew.append(x)
-        elif i == "G":
-            x += 1
-            skew.append(x)
-        else:
-            skew.append(x)
-    plt.plot(skew)
-    plt.xlim(xmin=0)
-    plt.savefig(file_name)
+    figure.savefig(file_name)
