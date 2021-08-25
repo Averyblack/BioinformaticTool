@@ -7,27 +7,27 @@ import itertools
 import re
 import time
 
-
-
+#creates the DB and inserts data into it using excel sheet
 conn = sqlite3.connect('database\Enzymes.db')
-
 cur = conn.cursor()
-
 enzymes = pd.read_excel('enzymes2.xlsx', sheet_name='Enzymes', header=0)
-
 enzymes.to_sql("Enzymes", conn, if_exists = "replace", index = False)
 
-
+#Search through the enzyme DB and returns sequence recognized by given enzyme and exact cut location
 def Quering(enzyme):
-
     sql_select_query = """SELECT Code FROM Enzymes WHERE Name = ?"""
     cur.execute(sql_select_query, (enzyme,))
     seq = cur.fetchone()[0]
-    return seq
+    sql_select_query_pos = """SELECT Position FROM Enzymes Where Name = ?"""
+    cur.execute(sql_select_query_pos, (enzyme,))
+    pos = cur.fetchone()[0]
+    sql_select_query_pos2 = """SELECT Position2 FROM Enzymes Where Name = ?"""
+    cur.execute(sql_select_query_pos2, (enzyme,))
+    pos2 = cur.fetchone()[0]
+    return seq, pos, pos2
 
-
+#Populates the drop down list with all enzymes presten in enzymes DB
 def ListPopulation():
-
     cur.execute("SELECT Name FROM Enzymes")
     z = cur.fetchall()
     y = []
@@ -35,6 +35,7 @@ def ListPopulation():
         y.append(x[0])
     return y
 
+#Generate every possible variant of the sequence with unspecified nucleotides recognised by enzyme
 def optionGeneration(seq):
     M = ["A", "C"]
     R = ["A", "G"]

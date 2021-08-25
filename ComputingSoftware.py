@@ -230,6 +230,7 @@ def ComplementaryReverse(pattern):
     t = ''.join(t)
     return t
 
+#Calculates number of differences between to patterns
 def HammingDistance(pattern, pattern2):
     diffCount = 0
     y = 0
@@ -239,6 +240,8 @@ def HammingDistance(pattern, pattern2):
         y += 1
     return diffCount
 
+#Calculates and return number of times given pattern occured in provided genome
+#with d numbers of differences with original pattern allowed
 def ApproximatePatternCount(genome, pattern, d):
     appCount = 0
     index = -1
@@ -249,6 +252,18 @@ def ApproximatePatternCount(genome, pattern, d):
         if x <= d:
             appCount += 1
     return appCount
+
+#Method that finds given pattern in a genome, returns it loction and cuts this genome accordingly
+#Propably based on ApproximatePatterCount()
+def restrictionSiteQuery(genome, pattern):
+    locList = []
+    for i in range(len(genome) - len(pattern)+1):
+        pattern2 = genome[i: i + len(pattern)]
+        if pattern2 == pattern:
+            loc = genome.index(pattern2, i)
+            locList.append(loc)
+    return locList
+
 
 def MostFrequentPattern(genome, d, patternLenght):
 
