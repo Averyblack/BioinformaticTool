@@ -9,7 +9,7 @@ def Purifier(genome):
     Seq = re.sub("[^ACTG]", "", Seq)
     return Seq
 
-#Changes T to U if sequence origins from NCBI cuz they succ
+#Changes T to U if sequence origins from NCBI
 def NcbiTtoU(genome):
     genome = Purifier(genome).upper()
     seq = re.sub("T", 'U', genome)
