@@ -86,7 +86,7 @@ class RestrictionWindow(QWidget):
 
     def interfejs(self):
 
-        opis = QLabel("Placeholder opisu", self)
+        opis = QLabel("Paste the sequence, choose the enzyme and click Restrict button.", self)
         self.inputWindow = QTextEdit("", self)
         self.outputWindow = QTextEdit("", self)
         self.enzymesList = QComboBox(self)
@@ -162,7 +162,7 @@ class TranscriptionWindow(QWidget):
 
     def interfejs(self):
         self.inputWindow = QTextEdit("", self)
-        opis = QLabel("Placeholder opisu", self)
+        opis = QLabel("Paste the sequence and use the Transcribe button to get the results.", self)
         transcribeButton = QPushButton("Transcribe", self)
         self.outputWindow = QTextEdit("", self)
         GClabel = QLabel("G/C percentage:", self)
@@ -224,7 +224,7 @@ class TranslationWindow(QWidget):
     def interfejs(self):
 
                 # etykiety
-        opis = QLabel("Placeholder opisu", self)
+        opis = QLabel("Paste the sequence and use the Translate button to get the results.", self)
         self.inputWindow = QTextEdit("", self)
         self.translateButton = QPushButton("Translate", self)
         self.outputWindow = QTextEdit("", self)
@@ -280,7 +280,7 @@ class OriWindow(QWidget):
 
 
 
-        opis = QLabel("Placeholder opisu", self)
+        opis = QLabel("Paste the sequence and use the Find Ori button to get the results. ORI is determined based on the G/A raito. Approx Ori is located at position with highest ratio.", self)
         self.inputWindow = QTextEdit("", self)
         self.diagram = SkewDiagramField()
         self.oriButton = QPushButton("Find Ori", self)
