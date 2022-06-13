@@ -3,27 +3,24 @@ from PyQt5.QtWidgets import QFileDialog
 import os
 import re
 
-#Removes evry signa other than nucleotide ACTG
+#Removes every sign other than nucleotide ACTG
 def Purifier(genome):
     Seq = genome.upper()
     Seq = re.sub("[^ACTG]", "", Seq)
     return Seq
 
-#Changes T to U if sequence origins from NCBI
+#Changes T to U if sequence origins from NCBI, because RNA sequences in NCBI contain T in stead of U (?)
 def NcbiTtoU(genome):
     genome = Purifier(genome).upper()
     seq = re.sub("T", 'U', genome)
     return seq
 
 def Transcription(sequence):
-
     Seq = Purifier(sequence)
-
     Length = len(Seq)
     if Length < 2:
-        print("Sequence to short! Abort mission!")
+        print("Sequence to short)
         quit()
-
     n = 1
     z = [Seq[i:i+n] for i in range(0, len(Seq), n)]
     delimiter = ' '
@@ -64,7 +61,7 @@ def Translation(sequence):
     t = [Seq[i:i+n] for i in range(0, len(Seq), n)]
     delimiter = ' '
     t = delimiter.join(t)
-#transkrypcja:
+#Translation - one by one:
     t = t.replace('aug', 'M')
     t = t.replace('aua', 'I')
     t = t.replace('auc', 'I')
@@ -135,10 +132,10 @@ def Translation(sequence):
     t = t.replace('c', "")
     t = t.replace('g', "")
     t = t.replace('a', "")
-#licza aminowkasów
     t = t.replace(" ", "")
     return t
 
+#Calculates protien lenght           
 def ProteinLenght(t):
     if "STOP" in t:
         p1 = len(t)-4
@@ -180,14 +177,15 @@ def SymbolToNumbers(symbol):
         return 2
     elif symbol == "T":
         return 3
-
+              
+#Currently not used 
 def PatternToNumber(pattern):
     if len(pattern) <= 0:
         return 0
     symbol = pattern[-1]
     prefix = pattern[:len(pattern) - 1]
     return 4 * PatternToNumber(prefix) + SymbolToNumbers(symbol)
-
+#Currently not used 
 def NumberToSymbol(number):
     if number == 0:
         return "A"
@@ -197,7 +195,7 @@ def NumberToSymbol(number):
         return "G"
     elif number == 3:
         return "T"
-
+#Currently not used 
 def NumberToPattern (index, k):
     if k == 1:
         return NumberToSymbol(index)
@@ -206,11 +204,10 @@ def NumberToPattern (index, k):
     symbol = NumberToSymbol(r)
     prefixPattern = NumberToPattern(prefixIndex, k-1)
     return prefixPattern + symbol
-
+#Currently not used 
 def ComplementaryReverse(pattern):
     x = pattern
     x = x.upper()
-
     n = 1
     z = [x[i:i+n] for i in range(0, len(x), n)]
     delimiter = ' '
@@ -231,6 +228,7 @@ def ComplementaryReverse(pattern):
     return t
 
 #Calculates number of differences between to patterns
+#Currently not used 
 def HammingDistance(pattern, pattern2):
     diffCount = 0
     y = 0
@@ -242,6 +240,7 @@ def HammingDistance(pattern, pattern2):
 
 #Calculates and return number of times given pattern occured in provided genome
 #with d numbers of differences with original pattern allowed
+#Currently not used 
 def ApproximatePatternCount(genome, pattern, d):
     appCount = 0
     index = -1
@@ -264,13 +263,11 @@ def restrictionSiteQuery(genome, pattern):
             locList.append(loc)
     return locList
 
-
+#Currently not used 
 def MostFrequentPattern(genome, d, patternLenght):
-
     frequencyArray = {}
     patterns = []
     output = []
-
     for i in range(len(genome)-patternLenght+1):
         pattern = genome[i:i + patternLenght]
         patterns.append(pattern)
